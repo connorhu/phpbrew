@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Tests\Extension;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 use PhpBrew\Extension\ExtensionDownloader;
 use PhpBrew\Extension\ExtensionFactory;

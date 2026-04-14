@@ -2,7 +2,7 @@
 
 namespace PhpBrew\PatchKit;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use PhpBrew\Buildable;
 
 interface PatchRule

@@ -2,7 +2,7 @@
 
 namespace PhpBrew;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 use PhpBrew\Extension\Provider\Provider;
 

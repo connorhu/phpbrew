@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Extension\Provider;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use Exception;
 use GetOptionKit\OptionResult;
 use PEARX\Channel as PeclChannel;

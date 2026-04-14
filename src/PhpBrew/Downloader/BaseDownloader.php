@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Downloader;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 use RuntimeException;
 
