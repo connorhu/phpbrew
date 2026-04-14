@@ -12,7 +12,7 @@ abstract class BaseDownloader
 
     protected $options;
 
-    public function __construct(Logger $logger, OptionResult $options)
+    public function __construct(Logger $logger, object $options)
     {
         $this->logger = $logger;
         $this->options = $options;
