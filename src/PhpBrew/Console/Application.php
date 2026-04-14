@@ -30,7 +30,7 @@ class Application extends BaseApplication
 
     public function getHelp(): string
     {
-        return <<<'BANNER'
+        $banner = <<<'BANNER'
   ______ _   _ ____________
   | ___ \ | | || ___ \ ___ \
   | |_/ / |_| || |_/ / |_/ /_ __ _____      __
@@ -39,6 +39,8 @@ class Application extends BaseApplication
   \_|   \_| |_/\_|   \____/|_|  \___| \_/\_/
 
 BANNER;
+        $parent = parent::getHelp();
+        return $parent ? $banner . $parent : $banner;
     }
 
     protected function getDefaultInputDefinition(): InputDefinition

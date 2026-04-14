@@ -5,7 +5,7 @@ namespace PhpBrew\Testing;
 use PhpBrew\Console\Application;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 abstract class CommandTestCase extends TestCase
 {
@@ -58,13 +58,22 @@ abstract class CommandTestCase extends TestCase
     }
 
     /**
-     * Build a StringInput from a command line, stripping the "phpbrew " prefix.
+     * Create an ApplicationTester for the given command line.
+     */
+    private function makeTester(string $cmdLine): ApplicationTester
+    {
+        $app = $this->setupApplication();
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+        return new ApplicationTester($app);
+    }
+
+    /**
+     * Strip the "phpbrew " prefix and return a StringInput.
      */
     private function makeInput(string $cmdLine): StringInput
     {
-        $args = trim(preg_replace('/^phpbrew\s+/', '', $cmdLine));
-        $input = new StringInput($args);
-        return $input;
+        return new StringInput(trim(preg_replace('/^phpbrew\s+/', '', $cmdLine)));
     }
 
     /**
@@ -74,12 +83,8 @@ abstract class CommandTestCase extends TestCase
      */
     public function runCommand(string $cmdLine): bool
     {
-        $app = $this->setupApplication();
-        $app->setAutoExit(false);
-        $app->setCatchExceptions(false);
-        $output = new BufferedOutput();
-        $status = $app->run($this->makeInput($cmdLine), $output);
-        return $status === 0;
+        $tester = $this->makeTester($cmdLine);
+        return $tester->run($this->makeInput($cmdLine), ['decorated' => false]) === 0;
     }
 
     /**
@@ -87,15 +92,9 @@ abstract class CommandTestCase extends TestCase
      */
     public function runCommandWithStdout(string $cmdLine): string|false
     {
-        $app = $this->setupApplication();
-        $app->setAutoExit(false);
-        $app->setCatchExceptions(false);
-        $output = new BufferedOutput();
-        $status = $app->run($this->makeInput($cmdLine), $output);
-        if ($status !== 0) {
-            return false;
-        }
-        return $output->fetch();
+        $tester = $this->makeTester($cmdLine);
+        $status = $tester->run($this->makeInput($cmdLine), ['decorated' => false]);
+        return $status === 0 ? $tester->getDisplay() : false;
     }
 
     /**
@@ -103,16 +102,13 @@ abstract class CommandTestCase extends TestCase
      */
     public function assertCommandSuccess(string $cmdLine): void
     {
-        $app = $this->setupApplication();
-        $app->setAutoExit(false);
-        $app->setCatchExceptions(false);
-        $output = new BufferedOutput();
+        $tester = $this->makeTester($cmdLine);
         try {
-            $status = $app->run($this->makeInput($cmdLine), $output);
+            $status = $tester->run($this->makeInput($cmdLine), ['decorated' => false]);
         } catch (\CurlKit\CurlException $e) {
             $this->markTestIncomplete($e->getMessage());
             return;
         }
-        $this->assertSame(0, $status, $output->fetch());
+        $this->assertSame(0, $status, $tester->getDisplay());
     }
 }
