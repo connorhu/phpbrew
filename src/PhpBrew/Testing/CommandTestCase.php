@@ -2,116 +2,117 @@
 
 namespace PhpBrew\Testing;
 
-use CLIFramework\Testing\CommandTestCase as BaseCommandTestCase;
-use GetOptionKit\Option;
-use PhpBrew\Console;
+use PhpBrew\Console\Application;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-abstract class CommandTestCase extends BaseCommandTestCase
+abstract class CommandTestCase extends TestCase
 {
     protected $debug = false;
 
-    private $previousPhpBrewRoot;
-
-    private $previousPhpBrewHome;
-
-    public $primaryVersion = '7.0.33';
+    public string $primaryVersion = '7.0.33';
 
     /**
      * You need to set this to true in each subclass you want to use VCR in.
      */
     public $usesVCR = false;
 
-    public function getPrimaryVersion()
+    public function getPrimaryVersion(): string
     {
-        /*
-        if ($version = getenv('TRAVIS_PHP_VERSION')) {
-            return "php-$version";
-        }
-        */
         return $this->primaryVersion;
     }
 
-    public function setupApplication()
+    /**
+     * Returns an Application instance with all commands registered.
+     * Tries to load the DI container from etc/container.php.
+     * Falls back to a bare Application (commands not registered yet during migration).
+     */
+    protected function setupApplication(): Application
     {
-        $console = Console::getInstance();
-        $console->getLogger()->setQuiet();
-        $console->getFormatter()->preferRawOutput();
-
-        return $console;
+        $containerFile = dirname(__DIR__, 3) . '/etc/container.php';
+        if (file_exists($containerFile)) {
+            $container = require $containerFile;
+            return $container->get(Application::class);
+        }
+        // During migration: return bare application (commands registered later via DI container)
+        $app = new Application();
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+        return $app;
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->previousPhpBrewRoot = getenv('PHPBREW_ROOT');
-        $this->previousPhpBrewHome = getenv('PHPBREW_HOME');
-
-        // <env name="PHPBREW_ROOT" value=".phpbrew"/>
-        // <env name="PHPBREW_HOME" value=".phpbrew"/>
-
-        // already setup in phpunit.xml, but it seems don't work.
-        // putenv('PHPBREW_ROOT=' . getcwd() . '/.phpbrew');
-        // putenv('PHPBREW_HOME=' . getcwd() . '/.phpbrew');
-
-        if ($options = Console::getInstance()->options) {
-            $option = new Option('no-progress');
-            $option->setValue(true);
-            $options->set('no-progress', $option);
-        }
-
         if ($this->usesVCR) {
             VCRAdapter::enableVCR($this);
         }
     }
 
-    /*
-     * we don't have to restore it back. the parent environment variables
-     * won't change if the they are changed inside a process.
-     * but we might want to change it back if there is a test changed the environment variable.
-     */
     protected function tearDown(): void
     {
-        if ($this->previousPhpBrewRoot !== null) {
-            // putenv('PHPBREW_ROOT=' . $this->previousPhpBrewRoot);
-        }
-        if ($this->previousPhpBrewHome !== null) {
-            // putenv('PHPBREW_HOME=' . $this->previousPhpBrewHome);
-        }
-
         if ($this->usesVCR) {
             VCRAdapter::disableVCR();
         }
     }
 
-    public function assertCommandSuccess($args)
+    /**
+     * Build a StringInput from a command line, stripping the "phpbrew " prefix.
+     */
+    private function makeInput(string $cmdLine): StringInput
     {
+        $args = trim(preg_replace('/^phpbrew\s+/', '', $cmdLine));
+        $input = new StringInput($args);
+        return $input;
+    }
+
+    /**
+     * Run a command and return true if it succeeded (exit code 0).
+     *
+     * @param string $cmdLine e.g. "phpbrew env" or "phpbrew --quiet known"
+     */
+    public function runCommand(string $cmdLine): bool
+    {
+        $app = $this->setupApplication();
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+        $output = new BufferedOutput();
+        $status = $app->run($this->makeInput($cmdLine), $output);
+        return $status === 0;
+    }
+
+    /**
+     * Run a command and return its output, or false on failure.
+     */
+    public function runCommandWithStdout(string $cmdLine): string|false
+    {
+        $app = $this->setupApplication();
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+        $output = new BufferedOutput();
+        $status = $app->run($this->makeInput($cmdLine), $output);
+        if ($status !== 0) {
+            return false;
+        }
+        return $output->fetch();
+    }
+
+    /**
+     * Assert that a command succeeds (exit code 0).
+     */
+    public function assertCommandSuccess(string $cmdLine): void
+    {
+        $app = $this->setupApplication();
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+        $output = new BufferedOutput();
         try {
-            if ($this->debug) {
-                fwrite(STDERR, $args . PHP_EOL);
-            }
-
-            ob_start();
-            $ret = parent::runCommand($args);
-            $output = ob_get_contents();
-            ob_end_clean();
-
-            $this->assertTrue($ret, $output);
+            $status = $app->run($this->makeInput($cmdLine), $output);
         } catch (\CurlKit\CurlException $e) {
             $this->markTestIncomplete($e->getMessage());
+            return;
         }
-    }
-
-    public function runCommand($args)
-    {
-        ob_start();
-        $status = parent::runCommand($args);
-        ob_end_clean();
-
-        return $status;
-    }
-
-    public function runCommandWithStdout($args)
-    {
-        return parent::runCommand($args);
+        $this->assertSame(0, $status, $output->fetch());
     }
 }
