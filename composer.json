@@ -29,7 +29,6 @@
         "corneltek/curlkit": "^1.0.11",
         "ext-simplexml": "*",
         "symfony/console": "^6.4",
-        "symfony/dependency-injection": "^6.4",
         "symfony/yaml": "^6.4",
         "jean85/pretty-package-versions": "^2.0"
     },

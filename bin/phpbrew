@@ -16,6 +16,5 @@
         exit(1);
     }
 
-    $container = require __DIR__ . '/../etc/container.php';
-    $container->get(\PhpBrew\Console\Application::class)->run();
+    \PhpBrew\Console\Bootstrap::createApplication()->run();
 })();

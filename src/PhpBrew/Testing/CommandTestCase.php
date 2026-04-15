@@ -32,8 +32,7 @@ abstract class CommandTestCase extends TestCase
     {
         $containerFile = dirname(__DIR__, 3) . '/etc/container.php';
         if (file_exists($containerFile)) {
-            $container = require $containerFile;
-            return $container->get(Application::class);
+            return require $containerFile;
         }
         $app = new Application();
         $app->setAutoExit(false);
