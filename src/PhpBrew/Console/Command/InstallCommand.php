@@ -649,7 +649,7 @@ EOT;
         return $settings;
     }
 
-    protected function installAs(string $source, string $target, bool $override = false, Logger $logger = null): bool|null
+    protected function installAs(string $source, string $target, bool $override = false, ?Logger $logger = null): bool|null
     {
         if (file_exists($source)) {
             if ($override || !file_exists($target)) {
