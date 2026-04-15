@@ -13,6 +13,11 @@ class RegExpPatchRule implements PatchRule
     private $files;
 
     /**
+     * @var callable|true|null
+     */
+    private $predicator = null;
+
+    /**
      * @var string the regexp pattern
      */
     private $pattern;
