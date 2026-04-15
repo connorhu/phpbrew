@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class VirtualCommand extends Command
 {
-    final protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         throw new RuntimeException(
             "If you see this, the ~/.phpbrew/bashrc script is not loaded in your shell.\n"
