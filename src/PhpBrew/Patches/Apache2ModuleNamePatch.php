@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Patches;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use PhpBrew\Buildable;
 use PhpBrew\PatchKit\Patch;
 use PhpBrew\PatchKit\RegExpPatchRule;

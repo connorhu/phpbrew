@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Tests\Extension;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use PhpBrew\Extension\ExtensionFactory;
 use PhpBrew\Extension\ExtensionManager;
 use PhpBrew\Testing\VCRAdapter;

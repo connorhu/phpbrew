@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Tests\Tasks;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 use PhpBrew\Buildable;
 use PhpBrew\Tasks\MakeTask;

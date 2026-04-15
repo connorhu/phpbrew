@@ -2,7 +2,7 @@
 
 namespace PhpBrew;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use Exception;
 use GetOptionKit\OptionResult;
 use PhpBrew\Downloader\DownloadFactory;
@@ -131,14 +131,14 @@ class ReleaseList
         }
     }
 
-    public function fetchRemoteReleaseList(OptionResult $options)
+    public function fetchRemoteReleaseList(object $options = null)
     {
         $releases = self::buildReleaseListFromOfficialSite($options);
         $this->setReleases($releases);
         $this->save();
     }
 
-    public static function getReadyInstance(OptionResult $options = null)
+    public static function getReadyInstance(object $options = null)
     {
         static $instance;
 
@@ -157,7 +157,7 @@ class ReleaseList
         return $instance;
     }
 
-    private static function downloadReleaseListFromOfficialSite($version, $max, OptionResult $options)
+    private static function downloadReleaseListFromOfficialSite($version, $max, object $options = null)
     {
         $url = 'https://www.php.net/releases/index.php?' . http_build_query(array(
             'json'    => true,
@@ -171,14 +171,14 @@ class ReleaseList
         return json_decode($json, true) ?? [];
     }
 
-    private static function buildReleaseListFromOfficialSite(OptionResult $options)
+    private static function buildReleaseListFromOfficialSite(object $options = null)
     {
         $obj = array_merge(
             self::downloadReleaseListFromOfficialSite(8, 100, $options),
             self::downloadReleaseListFromOfficialSite(7, 100, $options)
         );
 
-        if ($options->get('old')) {
+        if ($options && $options->old) {
             $obj = array_merge($obj, self::downloadReleaseListFromOfficialSite(5, 1000, $options));
         }
 

@@ -5,7 +5,7 @@ namespace PhpBrew\Patches;
 use PhpBrew\Buildable;
 use PhpBrew\PatchKit\Patch;
 use PhpBrew\PatchKit\DiffPatchRule;
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 
 class PHP56WithOpenSSL11Patch extends Patch
 {

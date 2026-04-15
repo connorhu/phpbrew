@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Extension;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use Exception;
 use PhpBrew\Config;
 use PhpBrew\Tasks\MakeTask;

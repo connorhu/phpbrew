@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Tasks;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 
 abstract class BaseTask
@@ -18,7 +18,7 @@ abstract class BaseTask
 
     public $finishedAt;
 
-    public function __construct(Logger $logger, OptionResult $options = null)
+    public function __construct(Logger $logger, object $options = null)
     {
         $this->startedAt = microtime(true);
         $this->logger = $logger;

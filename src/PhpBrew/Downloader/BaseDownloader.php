@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Downloader;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 use RuntimeException;
 
@@ -12,7 +12,7 @@ abstract class BaseDownloader
 
     protected $options;
 
-    public function __construct(Logger $logger, OptionResult $options)
+    public function __construct(Logger $logger, object $options)
     {
         $this->logger = $logger;
         $this->options = $options;

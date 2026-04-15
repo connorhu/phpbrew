@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Tests\Extension;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionResult;
 use PhpBrew\Extension\ExtensionDownloader;
 use PhpBrew\Extension\ExtensionFactory;
@@ -19,13 +19,6 @@ use PhpBrew\Testing\CommandTestCase;
  */
 class ExtensionInstallerTest extends CommandTestCase
 {
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $versionName = $this->getPrimaryVersion();
-        $this->runCommand("phpbrew use php-{$versionName}");
-    }
 
     /**
      * @group noVCR

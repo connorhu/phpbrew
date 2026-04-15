@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Patches;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use PhpBrew\Build;
 use PhpBrew\Testing\PatchTestCase;
 

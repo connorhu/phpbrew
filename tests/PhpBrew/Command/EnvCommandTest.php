@@ -2,7 +2,6 @@
 
 namespace PhpBrew\Tests\Command;
 
-use PhpBrew\Console;
 use PhpBrew\Testing\CommandTestCase;
 
 /**
@@ -10,11 +9,6 @@ use PhpBrew\Testing\CommandTestCase;
  */
 class EnvCommandTest extends CommandTestCase
 {
-    public function setupApplication()
-    {
-        return new Console();
-    }
-
     protected function setUp(): void
     {
         parent::setUp();

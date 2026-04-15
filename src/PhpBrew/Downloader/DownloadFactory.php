@@ -2,7 +2,7 @@
 
 namespace PhpBrew\Downloader;
 
-use CLIFramework\Logger;
+use PhpBrew\Logger;
 use GetOptionKit\OptionCollection;
 use GetOptionKit\OptionResult;
 
@@ -33,7 +33,7 @@ class DownloadFactory
      *
      * @return BaseDownloader|null
      */
-    protected static function create(Logger $logger, OptionResult $options, array $preferences, $requireSsl = true)
+    protected static function create(Logger $logger, object $options, array $preferences, $requireSsl = true)
     {
         foreach ($preferences as $prefKey) {
             if (isset(self::$availableDownloaders[$prefKey])) {
@@ -50,12 +50,12 @@ class DownloadFactory
 
     /**
      * @param Logger       $logger
-     * @param OptionResult $options
+     * @param object       $options
      * @param string       $downloader
      *
      * @return BaseDownloader
      */
-    public static function getInstance(Logger $logger, OptionResult $options, $downloader = null)
+    public static function getInstance(Logger $logger, object $options, $downloader = null)
     {
         if (is_string($downloader)) {
             //if we specific a downloader class clearly, then it's the only choice
@@ -70,7 +70,7 @@ class DownloadFactory
 
         //if --downloader presents, we will use it as the first choice,
         //even if the caller specific downloader by alias/array
-        if ($options->has('downloader')) {
+        if (isset($options->downloader)) {
             $logger->info("Found --downloader option, try to use {$options->downloader} as default downloader.");
             $downloader = array_merge(array($options->downloader), $downloader);
         }
