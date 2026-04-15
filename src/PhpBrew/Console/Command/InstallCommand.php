@@ -218,6 +218,16 @@ class InstallCommand extends Command
         // the variants argument array may include semantic options like 'as', 'like', 'using'
         $args = $input->getArgument('variants') ?: [];
 
+        // Symfony Console strips the -- separator before passing arguments.
+        // Re-insert it before the first configure option (starting with --)
+        // so VariantParser can correctly separate variants from extra configure flags.
+        foreach ($args as $i => $arg) {
+            if (str_starts_with($arg, '--')) {
+                array_splice($args, $i, 0, ['--']);
+                break;
+            }
+        }
+
         $semanticOptions = $this->parseSemanticOptions($args);
         $buildAs = isset($semanticOptions['as']) ? $semanticOptions['as'] : $input->getOption('name');
         $buildLike = isset($semanticOptions['like']) ? $semanticOptions['like'] : $input->getOption('like');
