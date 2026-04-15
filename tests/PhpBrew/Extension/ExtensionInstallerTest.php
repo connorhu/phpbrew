@@ -20,13 +20,6 @@ use PhpBrew\Testing\CommandTestCase;
 class ExtensionInstallerTest extends CommandTestCase
 {
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $versionName = $this->getPrimaryVersion();
-        $this->runCommand("phpbrew use php-{$versionName}");
-    }
-
     /**
      * @group noVCR
      */
