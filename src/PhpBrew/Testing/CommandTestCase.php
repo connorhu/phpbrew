@@ -5,7 +5,7 @@ namespace PhpBrew\Testing;
 use PhpBrew\Console\Application;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 abstract class CommandTestCase extends TestCase
 {
@@ -25,8 +25,8 @@ abstract class CommandTestCase extends TestCase
 
     /**
      * Returns an Application instance with all commands registered.
-     * Tries to load the DI container from etc/container.php.
-     * Falls back to a bare Application (commands not registered yet during migration).
+     * Loads the DI container from etc/container.php.
+     * Falls back to a bare Application if the container file does not exist yet.
      */
     protected function setupApplication(): Application
     {
@@ -35,7 +35,6 @@ abstract class CommandTestCase extends TestCase
             $container = require $containerFile;
             return $container->get(Application::class);
         }
-        // During migration: return bare application (commands registered later via DI container)
         $app = new Application();
         $app->setAutoExit(false);
         $app->setCatchExceptions(false);
@@ -58,14 +57,18 @@ abstract class CommandTestCase extends TestCase
     }
 
     /**
-     * Create an ApplicationTester for the given command line.
+     * Build a configured Application with autoExit and catchExceptions disabled.
      */
-    private function makeTester(string $cmdLine): ApplicationTester
+    private function makeApp(): Application
     {
+        // Reset SHELL_VERBOSITY so a previous --quiet run does not silence this app.
+        // Symfony Console's configureIO() reads SHELL_VERBOSITY from the environment.
+        putenv('SHELL_VERBOSITY=0');
+
         $app = $this->setupApplication();
         $app->setAutoExit(false);
         $app->setCatchExceptions(false);
-        return new ApplicationTester($app);
+        return $app;
     }
 
     /**
@@ -83,8 +86,9 @@ abstract class CommandTestCase extends TestCase
      */
     public function runCommand(string $cmdLine): bool
     {
-        $tester = $this->makeTester($cmdLine);
-        return $tester->run($this->makeInput($cmdLine), ['decorated' => false]) === 0;
+        $app = $this->makeApp();
+        $output = new BufferedOutput();
+        return $app->run($this->makeInput($cmdLine), $output) === 0;
     }
 
     /**
@@ -92,9 +96,10 @@ abstract class CommandTestCase extends TestCase
      */
     public function runCommandWithStdout(string $cmdLine): string|false
     {
-        $tester = $this->makeTester($cmdLine);
-        $status = $tester->run($this->makeInput($cmdLine), ['decorated' => false]);
-        return $status === 0 ? $tester->getDisplay() : false;
+        $app = $this->makeApp();
+        $output = new BufferedOutput();
+        $status = $app->run($this->makeInput($cmdLine), $output);
+        return $status === 0 ? $output->fetch() : false;
     }
 
     /**
@@ -102,13 +107,14 @@ abstract class CommandTestCase extends TestCase
      */
     public function assertCommandSuccess(string $cmdLine): void
     {
-        $tester = $this->makeTester($cmdLine);
+        $app = $this->makeApp();
+        $output = new BufferedOutput();
         try {
-            $status = $tester->run($this->makeInput($cmdLine), ['decorated' => false]);
+            $status = $app->run($this->makeInput($cmdLine), $output);
         } catch (\CurlKit\CurlException $e) {
             $this->markTestIncomplete($e->getMessage());
             return;
         }
-        $this->assertSame(0, $status, $tester->getDisplay());
+        $this->assertSame(0, $status, $output->fetch());
     }
 }

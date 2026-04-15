@@ -109,7 +109,7 @@ class InstallCommand extends Command
             ->addOption('no-install', null, InputOption::VALUE_NONE, 'Do not install, just run build the target')
             ->addOption(
                 'nice',
-                'n',
+                null,
                 InputOption::VALUE_REQUIRED,
                 'Runs build processes at an altered scheduling priority. '
                 . 'The priority can be adjusted over a range of -20 (the highest) to 20 (the lowest).'

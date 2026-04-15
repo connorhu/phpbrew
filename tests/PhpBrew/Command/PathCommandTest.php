@@ -25,16 +25,13 @@ class PathCommandTest extends CommandTestCase
     }
 
     /**
-     * @outputBuffering enabled
      * @dataProvider argumentsProvider
      */
     public function testPathCommand($arg, $pattern)
     {
         putenv('PHPBREW_PHP=7.4.0');
 
-        ob_start();
-        $this->runCommandWithStdout("phpbrew path $arg");
-        $path = ob_get_clean();
+        $path = $this->runCommandWithStdout("phpbrew path $arg");
         $this->assertRegExp($pattern, $path);
     }
 }

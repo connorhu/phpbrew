@@ -19,7 +19,7 @@ class ListCommand extends Command
             ->setName('list')
             ->setDescription('List installed PHPs')
             ->addOption('dir', 'd', InputOption::VALUE_NONE, 'Show php directories.')
-            ->addOption('variants', 'v', InputOption::VALUE_NONE, 'Show used variants.');
+            ->addOption('variants', null, InputOption::VALUE_NONE, 'Show used variants.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
