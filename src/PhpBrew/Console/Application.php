@@ -26,6 +26,7 @@ class Application extends BaseApplication
             $version = 'dev';
         }
         parent::__construct(self::NAME, $version);
+        $this->setDefaultCommand('list-commands');
     }
 
     public function getHelp(): string
